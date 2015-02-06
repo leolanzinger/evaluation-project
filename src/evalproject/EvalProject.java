@@ -14,6 +14,6 @@ public class EvalProject {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Experiment experiment = new Experiment();
+        Experiment experiment;
     }
 }
