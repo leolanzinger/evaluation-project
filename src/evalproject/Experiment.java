@@ -27,8 +27,9 @@ class Experiment {
     
     public Experiment(String participantName, int block, int trial, File designFile) {
         participant = participantName;
+        this.designFile = designFile;
         loadTrials();
-        initLog();
+        //initLog();
         nextTrial();
     }
     public void loadTrials() {
@@ -37,12 +38,13 @@ class Experiment {
         try {
               BufferedReader br = new BufferedReader(new FileReader(designFile));
               String line = br.readLine();
-              // ...
+              line = br.readLine();
               while(line != null) {
                    String[] parts = line.split(",");
-                   // ...
-                   // allTrials.add(new Trial(...));
+                   int test = Integer.parseInt(parts[5]);
+                   allTrials.add(new Trial());
                    line = br.readLine();
+                   System.out.println(test);
          }
               br.close();
         } catch (FileNotFoundException e) {
@@ -86,5 +88,6 @@ class Experiment {
            }
            Trial trial = allTrials.get(currentTrial);
            trial.displayInstructions();
+           trial.start();
     }
 }
