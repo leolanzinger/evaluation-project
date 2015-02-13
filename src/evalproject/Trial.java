@@ -38,6 +38,7 @@ class Trial {
     protected CText instructions;
     
     ArrayList<CEllipse> ellipses;
+    AnimationCircle circleAnimation;
     int x_dim, y_dim;
     protected boolean hit;
     protected long start_time, completion_time;
@@ -66,27 +67,43 @@ class Trial {
     }
     
     public void showShapes() {
-        if (targetChange.equals("VV2")) {
-            Canvas canvas = experiment.getCanvas();
-            ellipses = new ArrayList<CEllipse>();
-            System.out.println("----");
-            System.out.println("starting trial with " + nonTargetsCount + " items.");
-            int items_per_row = (int) Math.sqrt(nonTargetsCount);
-            for (int i = 1; i < (items_per_row) + 1; i++) {
-                for (int j = 1; j < (items_per_row) + 1; j++) {
-                    final CEllipse ellipse = canvas.newEllipse(((i*(x_dim/items_per_row))-20)-(x_dim/(items_per_row * 2)), ((j*(y_dim/items_per_row))-20)-(y_dim/(items_per_row * 2)), 40, 40);
-                    ellipses.add(ellipse);
-                    ellipse.addTag(experiment.getExperimentShapes());
-                    ellipse.setFillPaint(Color.GRAY);
-                }
+        Canvas canvas = experiment.getCanvas();
+        ellipses = new ArrayList<CEllipse>();
+        System.out.println("----");
+        System.out.println("starting trial with " + nonTargetsCount + " items.");
+        int items_per_row = (int) Math.sqrt(nonTargetsCount);
+        for (int i = 1; i < (items_per_row) + 1; i++) {
+            for (int j = 1; j < (items_per_row) + 1; j++) {
+                final CEllipse ellipse = canvas.newEllipse(((i*(x_dim/items_per_row))-20)-(x_dim/(items_per_row * 2)), ((j*(y_dim/items_per_row))-20)-(y_dim/(items_per_row * 2)), 40, 40);
+                ellipses.add(ellipse);
+                ellipse.addTag(experiment.getExperimentShapes());
+                ellipse.setFillPaint(Color.GRAY);
             }
         }
         Random rand = new Random();
         int randomItem = rand.nextInt(((nonTargetsCount-1) - 0) + 1);
-
         target = ellipses.get(randomItem);
-        target.setFillPaint(Color.RED);       
+        ellipses.get(randomItem).addTag(experiment.getTarget());
         
+        if (targetChange.equals("VV2")) {
+            // set red color
+            target.setFillPaint(Color.RED);  
+        }     
+        else if (targetChange.equals("VV1")) {
+            // start animation
+            circleAnimation = new AnimationCircle(experiment);
+            circleAnimation.setNbLaps(-1);
+            circleAnimation.setLapDuration(200);
+            circleAnimation.start();
+        }
+        else if (targetChange.equals("VV1VV2")) {
+            // start animation and set red color
+            target.setFillPaint(Color.RED);
+            circleAnimation = new AnimationCircle(experiment);
+            circleAnimation.setNbLaps(-1);
+            circleAnimation.setLapDuration(200);
+            circleAnimation.start();
+        }
         // set start time
         start_time = System.currentTimeMillis();
     }
@@ -94,6 +111,10 @@ class Trial {
     public void showPlaceHolders() {
         // set end time
         completion_time = start_time = (System.currentTimeMillis()) - start_time;
+        // stop animation
+        if (circleAnimation != null) {
+            circleAnimation.stop();
+        }
         System.out.println(completion_time);
         for (int i=0; i<ellipses.size(); i++) {
             ellipses.get(i).setFillPaint(Color.WHITE);
