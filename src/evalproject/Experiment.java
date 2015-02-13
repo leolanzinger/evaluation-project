@@ -105,7 +105,7 @@
         }
         public void initLog() {
             String logFileName = "log_S"+ participant +"_"+(new Date()).toString()+".csv";
-            logFile = new File(logFileName);
+            logFile = new File("logs/" + logFileName);
             try {
                   pwLog = new PrintWriter(logFile);
                   String header = "Block\t"
