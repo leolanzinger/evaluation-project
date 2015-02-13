@@ -7,13 +7,18 @@ package evalproject;
 import fr.lri.swingstates.canvas.CEllipse;
 import fr.lri.swingstates.canvas.CShape;
 import fr.lri.swingstates.canvas.CStateMachine;
+import fr.lri.swingstates.canvas.CText;
 import fr.lri.swingstates.canvas.Canvas;
 import fr.lri.swingstates.canvas.transitions.PressOnShape;
 import fr.lri.swingstates.sm.State;
 import fr.lri.swingstates.sm.Transition;
 import fr.lri.swingstates.sm.transitions.KeyPress;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Random;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 import oracle.jrockit.jfr.JFR;
@@ -29,50 +34,68 @@ class Trial {
     protected int nonTargetsCount;
     protected Experiment experiment;
     
-    int x_dim = 600;
-    int y_dim = 600;
+    protected CEllipse target;
     
-    public Trial() {
-        
+    ArrayList<CEllipse> ellipses;
+    int x_dim, y_dim;
+    
+    public Trial(Experiment exp, String tChange, int n_items) {
+        targetChange = tChange;
+        nonTargetsCount = n_items;
+        experiment = exp;
+        x_dim = experiment.x_dim;
+        y_dim = experiment.y_dim;
     }
     public void displayInstructions() {
-         // ...
+         Canvas canvas = experiment.getCanvas();
+         CText instructions = new CText(new Point2D.Double(30, 30), "instructions, press ENTER to begin test", new Font("Garamond", Font.BOLD , 11));
+         instructions.addTag(experiment.getInstructions());
+         experiment.getCanvas().addShape(instructions);
     }
     public void hideInstructions() {
-         //experiment.getCanvas().removeShapes(experiment.getInstructions());
+        System.out.println("hidden instructions");
+         experiment.getCanvas().removeShapes(experiment.getInstructions());
     }
     public void start() {
-        JFrame frame = new JFrame();
-        Canvas canvas = new Canvas(x_dim,y_dim);
-        final CEllipse ellipse = canvas.newEllipse((x_dim/2)-20, (y_dim/2)-20, 40, 40);
-        ellipse.setFillPaint(Color.GRAY);
-
-        CStateMachine pressOnCircle = new CStateMachine() {
-            State state = new State() {
-                Transition pressOnShape = new PressOnShape(){
-                    public void action() {
-                        CShape shapePressed = getShape();
-                        if(shapePressed == ellipse) {
-                           shapePressed.setFillPaint(Color.WHITE);
-                        }
-                    }
-                };
-                Transition pressSpaceBar = new KeyPress(KeyEvent.VK_SPACE) {
-                    public void action() {
-                        
-                    }
-                };
-            };
-        };
-                 
-        pressOnCircle.attachTo(canvas);
-        frame.getContentPane().add(canvas);
-        frame.pack();
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        canvas.requestFocus();
-        
-         
+        experiment.getCanvas().requestFocus();       
     }
-    public void stop() {}
+    
+    public void showShapes() {
+        Canvas canvas = experiment.getCanvas();
+        ellipses = new ArrayList<CEllipse>();
+        System.out.println("starting trial with " + nonTargetsCount + " items.");
+        int items_per_row = (int) Math.sqrt(nonTargetsCount);
+        for (int i = 1; i < (items_per_row) + 1; i++) {
+            for (int j = 1; j < (items_per_row) + 1; j++) {
+                final CEllipse ellipse = canvas.newEllipse(((i*(x_dim/items_per_row))-20)-(x_dim/(items_per_row * 2)), ((j*(y_dim/items_per_row))-20)-(y_dim/(items_per_row * 2)), 40, 40);
+                ellipses.add(ellipse);
+                ellipse.addTag(experiment.getExperimentShapes());
+                ellipse.setFillPaint(Color.GRAY);
+            }
+        }
+        
+        // get random number
+        Random rand = new Random();
+        int randomItem = rand.nextInt(((nonTargetsCount-1) - 0) + 1);
+        System.out.println(randomItem);
+        
+        target = ellipses.get(randomItem);
+        target.setFillPaint(Color.RED);
+        
+    }
+    
+    public void showPlaceHolders() {
+        for (int i=0; i<ellipses.size(); i++) {
+            ellipses.get(i).setFillPaint(Color.WHITE);
+        }
+    }
+            
+    public CEllipse getTarget() {
+        return target;
+    }
+    
+    public void stop() {
+        experiment.getCanvas().removeShapes(experiment.getInstructions());
+        experiment.getCanvas().removeShapes(experiment.getExperimentShapes());
+    }
 }
