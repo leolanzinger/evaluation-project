@@ -39,8 +39,12 @@ class Trial {
     
     ArrayList<CEllipse> ellipses;
     int x_dim, y_dim;
+    protected boolean hit;
+    protected long start_time, completion_time;
     
-    public Trial(Experiment exp, String tChange, int n_items) {
+    public Trial(Experiment exp, int n_block, int n_trial, String tChange, int n_items) {
+        block = n_block;
+        trial = n_trial;
         targetChange = tChange;
         nonTargetsCount = n_items;
         experiment = exp;
@@ -54,7 +58,6 @@ class Trial {
          experiment.getCanvas().addShape(instructions);
     }
     public void hideInstructions() {
-         System.out.println("hidden instructions");
          experiment.getCanvas().removeShapes(experiment.getInstructions());
          instructions.remove();
     }
@@ -63,30 +66,35 @@ class Trial {
     }
     
     public void showShapes() {
-        Canvas canvas = experiment.getCanvas();
-        ellipses = new ArrayList<CEllipse>();
-        System.out.println("starting trial with " + nonTargetsCount + " items.");
-        int items_per_row = (int) Math.sqrt(nonTargetsCount);
-        for (int i = 1; i < (items_per_row) + 1; i++) {
-            for (int j = 1; j < (items_per_row) + 1; j++) {
-                final CEllipse ellipse = canvas.newEllipse(((i*(x_dim/items_per_row))-20)-(x_dim/(items_per_row * 2)), ((j*(y_dim/items_per_row))-20)-(y_dim/(items_per_row * 2)), 40, 40);
-                ellipses.add(ellipse);
-                ellipse.addTag(experiment.getExperimentShapes());
-                ellipse.setFillPaint(Color.GRAY);
+        if (targetChange.equals("VV2")) {
+            Canvas canvas = experiment.getCanvas();
+            ellipses = new ArrayList<CEllipse>();
+            System.out.println("----");
+            System.out.println("starting trial with " + nonTargetsCount + " items.");
+            int items_per_row = (int) Math.sqrt(nonTargetsCount);
+            for (int i = 1; i < (items_per_row) + 1; i++) {
+                for (int j = 1; j < (items_per_row) + 1; j++) {
+                    final CEllipse ellipse = canvas.newEllipse(((i*(x_dim/items_per_row))-20)-(x_dim/(items_per_row * 2)), ((j*(y_dim/items_per_row))-20)-(y_dim/(items_per_row * 2)), 40, 40);
+                    ellipses.add(ellipse);
+                    ellipse.addTag(experiment.getExperimentShapes());
+                    ellipse.setFillPaint(Color.GRAY);
+                }
             }
         }
-        
-        // get random number
         Random rand = new Random();
         int randomItem = rand.nextInt(((nonTargetsCount-1) - 0) + 1);
-        System.out.println(randomItem);
-        
+
         target = ellipses.get(randomItem);
-        target.setFillPaint(Color.RED);
+        target.setFillPaint(Color.RED);       
         
+        // set start time
+        start_time = System.currentTimeMillis();
     }
     
     public void showPlaceHolders() {
+        // set end time
+        completion_time = start_time = (System.currentTimeMillis()) - start_time;
+        System.out.println(completion_time);
         for (int i=0; i<ellipses.size(); i++) {
             ellipses.get(i).setFillPaint(Color.WHITE);
         }

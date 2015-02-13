@@ -12,7 +12,6 @@
     import fr.lri.swingstates.sm.State;
     import fr.lri.swingstates.sm.Transition;
     import fr.lri.swingstates.sm.transitions.KeyPress;
-    import java.awt.Color;
     import java.awt.event.KeyEvent;
     import java.io.BufferedReader;
     import java.io.File;
@@ -22,7 +21,6 @@
     import java.io.PrintWriter;
     import java.util.ArrayList;
     import java.util.Date;
-import javax.media.jai.operator.ExpDescriptor;
     import javax.swing.JFrame;
     import javax.swing.WindowConstants;
 
@@ -37,6 +35,7 @@ import javax.media.jai.operator.ExpDescriptor;
         protected ArrayList<Trial> allTrials = new ArrayList<Trial>();
         protected int currentTrial = 0;
         protected String participant;
+        protected File logFile;
 
         protected CExtensionalTag experimentShape = new CExtensionalTag() {};
         protected CExtensionalTag instruction = new CExtensionalTag() {};
@@ -61,7 +60,7 @@ import javax.media.jai.operator.ExpDescriptor;
 
             setStateMachine();
             loadTrials();
-            //initLog();
+            initLog();
             nextTrial();
         }
         public void loadTrials() {
@@ -73,9 +72,11 @@ import javax.media.jai.operator.ExpDescriptor;
                   line = br.readLine();
                   while(line != null) {
                        String[] parts = line.split(",");
+                       int n_block = Integer.parseInt(parts[2]);
+                       int n_trial = Integer.parseInt(parts[3]);
                        String targetChange = parts[4];
                        int n_items = Integer.parseInt(parts[5]);
-                       allTrials.add(new Trial(this, targetChange, n_items));
+                       allTrials.add(new Trial(this, n_block, n_trial, targetChange, n_items));
                        line = br.readLine();
              }
                   br.close();
@@ -93,10 +94,18 @@ import javax.media.jai.operator.ExpDescriptor;
                nextTrial();
         }
         public void log(Trial trial) {
+            String row = trial.block + "\t"
+                       + trial.trial +"\t"
+                       + trial.targetChange + "\t"
+                       + trial.nonTargetsCount + "\t"
+                       + trial.completion_time +"\t"
+                       + trial.hit + "\n";
+            pwLog.append(row);
+            pwLog.flush();
         }
         public void initLog() {
             String logFileName = "log_S"+ participant +"_"+(new Date()).toString()+".csv";
-            File logFile = new File(logFileName);
+            logFile = new File(logFileName);
             try {
                   pwLog = new PrintWriter(logFile);
                   String header = "Block\t"
@@ -105,7 +114,7 @@ import javax.media.jai.operator.ExpDescriptor;
                              +"NonTargetsCount\t"
                              +"Duration\t"
                              +"Hit\n";
-                  pwLog.print(header);
+                  pwLog.append(header);
                   pwLog.flush();
             } catch (FileNotFoundException e) {
                   e.printStackTrace();
@@ -137,9 +146,11 @@ import javax.media.jai.operator.ExpDescriptor;
                         public void action() {
                             CShape shapePressed = getShape();
                             if(shapePressed == allTrials.get(currentTrial).getTarget()) {
-                               System.out.println("correct");
+                                allTrials.get(currentTrial).hit = true;
+                                System.out.println("correct");
                             }
                             else {
+                                allTrials.get(currentTrial).hit = false;
                                 System.out.println("wrong");
                             }
                             trialCompleted();
