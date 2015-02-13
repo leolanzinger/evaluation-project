@@ -35,6 +35,7 @@ class Trial {
     protected Experiment experiment;
     
     protected CEllipse target;
+    protected CText instructions;
     
     ArrayList<CEllipse> ellipses;
     int x_dim, y_dim;
@@ -48,13 +49,14 @@ class Trial {
     }
     public void displayInstructions() {
          Canvas canvas = experiment.getCanvas();
-         CText instructions = new CText(new Point2D.Double(30, 30), "instructions, press ENTER to begin test", new Font("Garamond", Font.BOLD , 11));
+         instructions = new CText(new Point2D.Double(30, 30), "instructions" + experiment.currentTrial + ", press ENTER to begin test", new Font("Garamond", Font.BOLD , 11));
          instructions.addTag(experiment.getInstructions());
          experiment.getCanvas().addShape(instructions);
     }
     public void hideInstructions() {
-        System.out.println("hidden instructions");
+         System.out.println("hidden instructions");
          experiment.getCanvas().removeShapes(experiment.getInstructions());
+         instructions.remove();
     }
     public void start() {
         experiment.getCanvas().requestFocus();       
