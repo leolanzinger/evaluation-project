@@ -11,6 +11,7 @@ import fr.lri.swingstates.canvas.Canvas;
 import fr.lri.swingstates.canvas.transitions.PressOnShape;
 import fr.lri.swingstates.sm.State;
 import fr.lri.swingstates.sm.Transition;
+import fr.lri.swingstates.sm.transitions.Event;
 import fr.lri.swingstates.sm.transitions.KeyPress;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
@@ -41,6 +42,7 @@ class Experiment {
     protected CExtensionalTag experimentShape = new CExtensionalTag() {};
     protected CExtensionalTag instruction = new CExtensionalTag() {};
     protected CExtensionalTag target = new CExtensionalTag() {};
+    protected CExtensionalTag transitions = new CExtensionalTag() {};
 
     public int x_dim = 600;
     public int y_dim = 600;
@@ -123,15 +125,24 @@ class Experiment {
         }
     }
     public void stop() {
-           // display a "thank you" message
+        // TODO: display a "thank you" message
+
     }
 
     public void setStateMachine() {
         expStateMachine = new CStateMachine() {
             State instructionsShown = new State() {
-                Transition pressSpaceBar = new KeyPress(KeyEvent.VK_ENTER, ">> shapesShown") {
+                Transition pressSpaceBar = new KeyPress(KeyEvent.VK_ENTER, ">> transitionShown") {
                     public void action() {
                         allTrials.get(currentTrial).hideInstructions();
+                        allTrials.get(currentTrial).displayTransition();
+                    }
+                };
+            };
+            State transitionShown = new State() {
+                Transition completed = new Event("transitionCompleted", ">> shapesShown") {
+                    public void action() {
+                        allTrials.get(currentTrial).hideTransition();
                         allTrials.get(currentTrial).showShapes();
                     }
                 };
@@ -170,6 +181,7 @@ class Experiment {
             }
             Trial trial = allTrials.get(currentTrial);
             trial.displayInstructions();
+            
             trial.start();
      }
 
@@ -187,5 +199,9 @@ class Experiment {
     
     public CExtensionalTag getTarget() {
         return target;
+    }
+    
+    public CExtensionalTag getTransitions() {
+        return transitions;
     }
 }

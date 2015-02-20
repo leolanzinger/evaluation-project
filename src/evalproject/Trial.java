@@ -10,6 +10,7 @@ import fr.lri.swingstates.canvas.CStateMachine;
 import fr.lri.swingstates.canvas.CText;
 import fr.lri.swingstates.canvas.Canvas;
 import fr.lri.swingstates.canvas.transitions.PressOnShape;
+import fr.lri.swingstates.events.VirtualEvent;
 import fr.lri.swingstates.sm.State;
 import fr.lri.swingstates.sm.Transition;
 import fr.lri.swingstates.sm.transitions.KeyPress;
@@ -35,7 +36,11 @@ class Trial {
     protected Experiment experiment;
     
     protected CEllipse target;
+    protected CText trialNumber;
     protected CText instructions;
+    
+    protected CText transitionText;
+    protected CText transitionCountDown;
     
     ArrayList<CEllipse> ellipses;
     AnimationCircle circleAnimation;
@@ -54,14 +59,46 @@ class Trial {
     }
     public void displayInstructions() {
          Canvas canvas = experiment.getCanvas();
-         instructions = new CText(new Point2D.Double(30, 30), "instructions" + experiment.currentTrial + ", press ENTER to begin test", new Font("Garamond", Font.BOLD , 11));
+         trialNumber = new CText(new Point2D.Double(30, 30), "Trial: " + experiment.currentTrial + "/" + experiment.allTrials.size(), new Font("Helvetica", Font.BOLD , 26));
+         instructions = new CText(new Point2D.Double(30, 90), "Press ENTER to begin test", new Font("Helvetica Neue", Font.BOLD , 18));
          instructions.addTag(experiment.getInstructions());
+         experiment.getCanvas().addShape(trialNumber);
          experiment.getCanvas().addShape(instructions);
     }
     public void hideInstructions() {
          experiment.getCanvas().removeShapes(experiment.getInstructions());
          instructions.remove();
+         trialNumber.remove();
     }
+    public void displayTransition() {
+         Canvas canvas = experiment.getCanvas();
+         transitionText = new CText(new Point2D.Double(100, 250), "The next trial starts in", new Font("Helvetica Neue", Font.BOLD , 26));
+         transitionText.addTag(experiment.getTransitions());
+         experiment.getCanvas().addShape(transitionText);
+         
+        // Show numbers for transition
+         for (int i = 0; i < 3; i++) {
+             String secondLeft = Integer.toString(i+1);
+             transitionCountDown = new CText(new Point2D.Double(100, 250), secondLeft , new Font("Helvetica Neue", Font.BOLD , 45));
+             transitionCountDown.addTag(experiment.getTransitions());
+             experiment.getCanvas().addShape(transitionCountDown);
+            /*try {
+                Thread.sleep(1000);                 // 1000 milliseconds is one second.
+            } catch(InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }*/
+            experiment.getCanvas().removeShapes(experiment.getTransitions());
+        }
+        // transition event
+        System.out.println("Trying to trigger event");
+        experiment.expStateMachine.processEvent(new VirtualEvent("transitionCompleted"));
+    }
+    public void hideTransition() {
+         experiment.getCanvas().removeShapes(experiment.getTransitions());
+         transitionText.remove();
+         transitionCountDown.remove();
+    }
+    
     public void start() {
         experiment.getCanvas().requestFocus();       
     }
