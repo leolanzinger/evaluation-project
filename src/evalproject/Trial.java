@@ -59,8 +59,8 @@ class Trial {
     }
     public void displayInstructions() {
          Canvas canvas = experiment.getCanvas();
-         trialNumber = new CText(new Point2D.Double(30, 30), "Trial: " + experiment.currentTrial + "/" + experiment.allTrials.size(), new Font("Helvetica", Font.BOLD , 26));
-         instructions = new CText(new Point2D.Double(30, 90), "Press ENTER to begin test", new Font("Helvetica Neue", Font.BOLD , 18));
+         trialNumber = new CText(new Point2D.Double(30, 30), "User: " + block + ", trial: " + trial , new Font("Helvetica", Font.BOLD , 26));
+         instructions = new CText(new Point2D.Double(30, 90), "Press SPACE to begin test", new Font("Helvetica Neue", Font.BOLD , 18));
          instructions.addTag(experiment.getInstructions());
          experiment.getCanvas().addShape(trialNumber);
          experiment.getCanvas().addShape(instructions);
@@ -69,34 +69,6 @@ class Trial {
          experiment.getCanvas().removeShapes(experiment.getInstructions());
          instructions.remove();
          trialNumber.remove();
-    }
-    public void displayTransition() {
-         Canvas canvas = experiment.getCanvas();
-         transitionText = new CText(new Point2D.Double(100, 250), "The next trial starts in", new Font("Helvetica Neue", Font.BOLD , 26));
-         transitionText.addTag(experiment.getTransitions());
-         experiment.getCanvas().addShape(transitionText);
-         
-        // Show numbers for transition
-         for (int i = 0; i < 3; i++) {
-             String secondLeft = Integer.toString(i+1);
-             transitionCountDown = new CText(new Point2D.Double(100, 250), secondLeft , new Font("Helvetica Neue", Font.BOLD , 45));
-             transitionCountDown.addTag(experiment.getTransitions());
-             experiment.getCanvas().addShape(transitionCountDown);
-            /*try {
-                Thread.sleep(1000);                 // 1000 milliseconds is one second.
-            } catch(InterruptedException ex) {
-                Thread.currentThread().interrupt();
-            }*/
-            experiment.getCanvas().removeShapes(experiment.getTransitions());
-        }
-        // transition event
-        System.out.println("Trying to trigger event");
-        experiment.expStateMachine.processEvent(new VirtualEvent("transitionCompleted"));
-    }
-    public void hideTransition() {
-         experiment.getCanvas().removeShapes(experiment.getTransitions());
-         transitionText.remove();
-         transitionCountDown.remove();
     }
     
     public void start() {

@@ -42,7 +42,6 @@ class Experiment {
     protected CExtensionalTag experimentShape = new CExtensionalTag() {};
     protected CExtensionalTag instruction = new CExtensionalTag() {};
     protected CExtensionalTag target = new CExtensionalTag() {};
-    protected CExtensionalTag transitions = new CExtensionalTag() {};
 
     public int x_dim = 600;
     public int y_dim = 600;
@@ -132,17 +131,9 @@ class Experiment {
     public void setStateMachine() {
         expStateMachine = new CStateMachine() {
             State instructionsShown = new State() {
-                Transition pressSpaceBar = new KeyPress(KeyEvent.VK_ENTER, ">> transitionShown") {
+                Transition pressSpaceBar = new KeyPress(KeyEvent.VK_SPACE, ">> shapesShown") {
                     public void action() {
                         allTrials.get(currentTrial).hideInstructions();
-                        allTrials.get(currentTrial).displayTransition();
-                    }
-                };
-            };
-            State transitionShown = new State() {
-                Transition completed = new Event("transitionCompleted", ">> shapesShown") {
-                    public void action() {
-                        allTrials.get(currentTrial).hideTransition();
                         allTrials.get(currentTrial).showShapes();
                     }
                 };
@@ -199,9 +190,5 @@ class Experiment {
     
     public CExtensionalTag getTarget() {
         return target;
-    }
-    
-    public CExtensionalTag getTransitions() {
-        return transitions;
     }
 }
