@@ -42,6 +42,7 @@ class Experiment {
     protected CExtensionalTag experimentShape = new CExtensionalTag() {};
     protected CExtensionalTag instruction = new CExtensionalTag() {};
     protected CExtensionalTag target = new CExtensionalTag() {};
+    protected CExtensionalTag movingNonTarget = new CExtensionalTag() {};
 
     public int x_dim = 600;
     public int y_dim = 600;
@@ -66,6 +67,9 @@ class Experiment {
         initLog();
         nextTrial();
     }
+    
+    
+    
     public void loadTrials() {
         allTrials.clear();
         // read the design file and keep only the trials to run
@@ -75,11 +79,12 @@ class Experiment {
               line = br.readLine();
               while(line != null) {
                    String[] parts = line.split(",");
+                   int n_participant = Integer.parseInt(parts[0]);
                    int n_block = Integer.parseInt(parts[2]);
                    int n_trial = Integer.parseInt(parts[3]);
                    String targetChange = parts[4];
                    int n_items = Integer.parseInt(parts[5]);
-                   allTrials.add(new Trial(this, n_block, n_trial, targetChange, n_items));
+                   allTrials.add(new Trial(this, n_participant ,n_block, n_trial, targetChange, n_items));
                    line = br.readLine();
          }
               br.close();
@@ -190,5 +195,9 @@ class Experiment {
     
     public CExtensionalTag getTarget() {
         return target;
+    }
+    
+    public CExtensionalTag getMovingNonTarget() {
+        return movingNonTarget;
     }
 }

@@ -29,11 +29,14 @@ import oracle.jrockit.jfr.JFR;
  * @author Leo
  */
 class Trial {
+    protected int participant;
     protected int block;
     protected int trial;
     protected String targetChange;
     protected int nonTargetsCount;
     protected Experiment experiment;
+    
+    protected String currentUser;
     
     protected CEllipse target;
     protected CText trialNumber;
@@ -47,7 +50,8 @@ class Trial {
     protected boolean hit;
     protected long start_time, completion_time;
     
-    public Trial(Experiment exp, int n_block, int n_trial, String tChange, int n_items) {
+    public Trial(Experiment exp,int n_participant, int n_block, int n_trial, String tChange, int n_items) {
+        participant = n_participant;
         block = n_block;
         trial = n_trial;
         targetChange = tChange;
@@ -58,19 +62,22 @@ class Trial {
     }
     public void displayInstructions() {
          Canvas canvas = experiment.getCanvas();
-         trialNumber = new CText(new Point2D.Double(30, 30), "User: " + block + ", trial: " + trial , new Font("Helvetica", Font.BOLD , 26));
-         instructionsText = new CText(new Point2D.Double(30, 60), "Instructions" , new Font("Helvetica", Font.BOLD , 26));
-         if (targetChange.equals("VV1")) {
-             instructionsText.setText("instruction for v1");
+         trialNumber = new CText(new Point2D.Double(30, 30), "User: " + participant + ", trial: " + trial , new Font("Helvetica Neue", Font.BOLD , 26));
+         instructionsText = new CText(new Point2D.Double(30, 80), "Instructions" , new Font("Helvetica Neue", Font.BOLD , 18));
+         if (targetChange.equals("VV2")) {
+             // VV1
+             instructionsText.setText("Target object: different hue / color");
          }
-         else if (targetChange.equals("VV2")) {
-             instructionsText.setText("instruction for v2");
+         else if (targetChange.equals("VV1")) {
+             // VV2
+             instructionsText.setText("Target object: moving object");
          }
          else {
-             instructionsText.setText("instruction for v1v2");
+             // VV1VV2
+             instructionsText.setText("Target object: moving object with different hue / color");
          }
          
-         instructions = new CText(new Point2D.Double(30, 120), "Press SPACE to begin test", new Font("Helvetica Neue", Font.BOLD , 18));
+         instructions = new CText(new Point2D.Double(30, 140), "Press SPACE to begin test" + '\n' + "and press SPACE again when you recognized the target object.", new Font("Helvetica Neue", Font.BOLD , 12));
          instructions.addTag(experiment.getInstructions());
          trialNumber.addTag(experiment.getInstructions());
          instructionsText.addTag(experiment.getInstructions());
@@ -84,6 +91,7 @@ class Trial {
          trialNumber.remove();
          instructionsText.remove();
     }
+
     
     public void start() {
         experiment.getCanvas().requestFocus();       
@@ -114,6 +122,7 @@ class Trial {
         }     
         else if (targetChange.equals("VV1")) {
             // start animation
+            target.addTag(experiment.getMovingNonTarget());
             circleAnimation = new AnimationCircle(experiment);
             circleAnimation.setNbLaps(-1);
             circleAnimation.setLapDuration(200);
@@ -121,7 +130,21 @@ class Trial {
         }
         else if (targetChange.equals("VV1VV2")) {
             // start animation and set red color
+            for (int i = 0; i < ellipses.size(); i++) {
+                Random rand_red = new Random();
+                int randomRedNumber = rand.nextInt((2) + 1) + 0;
+                if (randomRedNumber == 0) {
+                    ellipses.get(i).setFillPaint(Color.RED);
+                }
+                else if (randomRedNumber == 1) {
+                    ellipses.get(i).setFillPaint(Color.GRAY);
+                }
+                else {
+                    ellipses.get(i).addTag(experiment.getMovingNonTarget());
+                }
+            }
             target.setFillPaint(Color.RED);
+            target.addTag(experiment.getMovingNonTarget());
             circleAnimation = new AnimationCircle(experiment);
             circleAnimation.setNbLaps(-1);
             circleAnimation.setLapDuration(200);
