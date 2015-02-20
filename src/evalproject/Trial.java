@@ -39,8 +39,7 @@ class Trial {
     protected CText trialNumber;
     protected CText instructions;
     
-    protected CText transitionText;
-    protected CText transitionCountDown;
+    protected CText instructionsText;
     
     ArrayList<CEllipse> ellipses;
     AnimationCircle circleAnimation;
@@ -60,15 +59,30 @@ class Trial {
     public void displayInstructions() {
          Canvas canvas = experiment.getCanvas();
          trialNumber = new CText(new Point2D.Double(30, 30), "User: " + block + ", trial: " + trial , new Font("Helvetica", Font.BOLD , 26));
-         instructions = new CText(new Point2D.Double(30, 90), "Press SPACE to begin test", new Font("Helvetica Neue", Font.BOLD , 18));
+         instructionsText = new CText(new Point2D.Double(30, 60), "Instructions" , new Font("Helvetica", Font.BOLD , 26));
+         if (targetChange.equals("VV1")) {
+             instructionsText.setText("instruction for v1");
+         }
+         else if (targetChange.equals("VV2")) {
+             instructionsText.setText("instruction for v2");
+         }
+         else {
+             instructionsText.setText("instruction for v1v2");
+         }
+         
+         instructions = new CText(new Point2D.Double(30, 120), "Press SPACE to begin test", new Font("Helvetica Neue", Font.BOLD , 18));
          instructions.addTag(experiment.getInstructions());
+         trialNumber.addTag(experiment.getInstructions());
+         instructionsText.addTag(experiment.getInstructions());
          experiment.getCanvas().addShape(trialNumber);
+         experiment.getCanvas().addShape(instructionsText);
          experiment.getCanvas().addShape(instructions);
     }
     public void hideInstructions() {
          experiment.getCanvas().removeShapes(experiment.getInstructions());
          instructions.remove();
          trialNumber.remove();
+         instructionsText.remove();
     }
     
     public void start() {
