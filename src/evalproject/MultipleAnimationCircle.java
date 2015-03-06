@@ -1,41 +1,45 @@
 package evalproject;
 
 import fr.lri.swingstates.animations.Animation;
+import fr.lri.swingstates.canvas.CEllipse;
 
 /**
- * Display animation for the only targeted 
- * circle.
+ * Display animation for a targeted circle
+ * use this function for multiple targeted 
+ * animated ellipses.
  * @author Leo
  */
- class AnimationCircle extends Animation {
+class MultipleAnimationCircle extends Animation {
         double translatex, translatey;
         double start_x, start_y;
         Experiment experiment;
+        CEllipse ellipse;
  
-        public AnimationCircle(Experiment exp) {
+        public MultipleAnimationCircle(Experiment exp, CEllipse ell) {
                 super();
                 translatex = 20;
                 translatey = 20;
                 experiment = exp;
+                ellipse = ell;
         }
  
         public void step(double t) {
                 if (t < 0.5) {
-                    experiment.getTarget().translateBy(0, 4);
+                    ellipse.translateBy(0, 4);
                 }
                 else {
-                    experiment.getTarget().translateBy(0, -4);
+                    ellipse.translateBy(0, -4);
                 }
         }
         
         // save starting coords
         public void doStart() {
-            start_x = experiment.getTarget().getCenterX();
-            start_y = experiment.getTarget().getCenterY();
+            start_x = ellipse.getCenterX();
+            start_y = ellipse.getCenterY();
         }
         
         // put coords back
         public void doStop() {
-            experiment.getTarget().translateTo(start_x, start_y);
+            ellipse.translateTo(start_x, start_y);
         }
- }
+}

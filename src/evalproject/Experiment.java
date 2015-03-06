@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package evalproject;
 
 import fr.lri.swingstates.canvas.CExtensionalTag;
@@ -31,7 +27,7 @@ import javax.swing.WindowConstants;
  * @author Leo
  */
 class Experiment {
-    // experiment.csv
+    // general variables
     protected File designFile = null;
     protected PrintWriter pwLog = null;
     protected ArrayList<Trial> allTrials = new ArrayList<Trial>();
@@ -39,35 +35,46 @@ class Experiment {
     protected String participant;
     protected File logFile;
 
+    // tag variables
     protected CExtensionalTag experimentShape = new CExtensionalTag() {};
     protected CExtensionalTag instruction = new CExtensionalTag() {};
     protected CExtensionalTag target = new CExtensionalTag() {};
 
+    // graphic display variables
     public int x_dim = 600;
     public int y_dim = 600;
     public JFrame frame;
     public Canvas canvas;
     CStateMachine expStateMachine;
 
+    /*
+        Instantiate experiment class
+    */
     public Experiment(String participantName, int block, int trial, File designFile) {
         participant = participantName;
         this.designFile = designFile;
 
+        // put canvas in frame and set it visible
         frame = new JFrame();
         canvas = new Canvas(x_dim,y_dim);
-
         frame.getContentPane().add(canvas);
         frame.pack();
         frame.setVisible(true);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
+        // start experiment
         setStateMachine();
         loadTrials();
         initLog();
         nextTrial();
     }
+    
+    /*
+        Load all trials from csv file
+    */
     public void loadTrials() {
         allTrials.clear();
+        
         // read the design file and keep only the trials to run
         try {
               BufferedReader br = new BufferedReader(new FileReader(designFile));
@@ -89,13 +96,24 @@ class Experiment {
               e.printStackTrace();
         }
     }
+    
+    /*
+        Move to next trial after
+        one is completed
+    */
     public void trialCompleted() {
            Trial trial = allTrials.get(currentTrial);
            trial.stop();
+           // log completed trial data
            log(trial);
            currentTrial++;
            nextTrial();
     }
+    
+    /*
+        Log completed trial data
+        into a resulting csv file.
+    */
     public void log(Trial trial) {
         String row = trial.block + "\t"
                    + trial.trial +"\t"
@@ -106,7 +124,14 @@ class Experiment {
         pwLog.append(row);
         pwLog.flush();
     }
+    
+    /*
+        Initialize results log file 
+        in /logs folder inside project
+        folder.
+    */
     public void initLog() {
+        // set file name and put it
         String logFileName = "log_S"+ participant +"_"+(new Date()).toString()+".csv";
         logFile = new File("logs/" + logFileName);
         try {
@@ -123,11 +148,18 @@ class Experiment {
               e.printStackTrace();
         }
     }
+    
+    /*
+        Stop and finish the experiment
+    */
     public void stop() {
         // TODO: display a "thank you" message
-
     }
 
+    /*
+        Start state machine that controls trial
+        flow.
+    */
     public void setStateMachine() {
         expStateMachine = new CStateMachine() {
             State instructionsShown = new State() {
@@ -150,12 +182,12 @@ class Experiment {
                     public void action() {
                         CShape shapePressed = getShape();
                         if(shapePressed == allTrials.get(currentTrial).getTarget()) {
+                            // correct target hit
                             allTrials.get(currentTrial).hit = true;
-                            System.out.println("correct");
                         }
                         else {
+                            // wrong target hit
                             allTrials.get(currentTrial).hit = false;
-                            System.out.println("wrong");
                         }
                         trialCompleted();
                     }
@@ -166,28 +198,44 @@ class Experiment {
         expStateMachine.attachTo(canvas);
     }
 
+    /*
+        Move to next trial in trial list
+    */
     public void nextTrial() {
             if(currentTrial >= allTrials.size()) {
              stop(); 
             }
             Trial trial = allTrials.get(currentTrial);
             trial.displayInstructions();
-            
             trial.start();
      }
 
+    /*
+        Get current experiment canvas
+    */
     public Canvas getCanvas() {
         return canvas;
     }
 
+    /*
+        Get experiment shapes displayed
+        currently in the canvas
+    */
     public CExtensionalTag getExperimentShapes() {
         return experimentShape;
     }
 
+    /*
+        Get instruction elements displayed
+        currently in the canvas
+    */
     public CExtensionalTag getInstructions() {
         return instruction;
     }
     
+    /*
+        Get currently set target ellipse
+    */
     public CExtensionalTag getTarget() {
         return target;
     }
