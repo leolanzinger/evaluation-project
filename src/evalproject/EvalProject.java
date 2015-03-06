@@ -13,7 +13,8 @@ public class EvalProject {
     public static void main(String[] args) {
         Experiment experiment = new Experiment("0", 1, 1, new File("experiment.csv"));
         
-        // uncomment next line to load a debug version of the csv starting from VV1VV2
+        // uncomment next lines to load debug version of the csv starting from VV
         //Experiment experiment = new Experiment("0", 1, 1, new File("experiment_debug.csv"));
+        //Experiment experiment = new Experiment("0", 1, 1, new File("experiment_debug_2.csv"));
     }
 }
