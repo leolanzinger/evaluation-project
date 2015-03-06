@@ -25,7 +25,6 @@ import oracle.jrockit.jfr.JFR;
  * @author Leo
  */
 class Trial {
-    
     // general variables
     protected int block;
     protected int trial;
@@ -102,6 +101,7 @@ class Trial {
         trialNumber.remove();
         instructionsText.remove();
     }
+
     
     /*
         Start trial
